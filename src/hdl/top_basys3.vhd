@@ -88,10 +88,10 @@ architecture top_basys3_arch of top_basys3 is
 	-- declare components
 component thunderbird_fsm is 
       port(
-          i_clk, i_reset  : in    std_logic;
-          i_left, i_right : in    std_logic;
-          o_lights_L      : out   std_logic_vector(2 downto 0);
-          o_lights_R      : out   std_logic_vector(2 downto 0)
+          i_clk, i_reset  : in    std_logic; -- divided clock and compenent reset
+          i_left, i_right : in    std_logic; -- left and right turn signals (activate both for hazards)
+          o_lights_L      : out   std_logic_vector(2 downto 0); -- 3 element array for left lights
+          o_lights_R      : out   std_logic_vector(2 downto 0)  -- 3 element array for right lights
       );
 end component thunderbird_fsm;
 
@@ -109,7 +109,7 @@ begin
 	-- PORT MAPS ----------------------------------------
 	thunderbird_fsm_inst :	thunderbird_fsm 
         port map (
-              i_clk => w_clk,
+              i_clk => w_clk, -- clock
               i_reset => btnR,
               i_left => sw(15),
               i_right => sw(0),
@@ -121,7 +121,7 @@ begin
               o_lights_R(2) => led(0)
           );
 	clkdiv_inst : clock_divider 		--instantiation of clock_divider to take 
-          generic map ( k_DIV => 12500000 ) -- 1 Hz clock from 100 MHz
+          generic map ( k_DIV => 12500000 ) -- 4 Hz clock from 100 MHz
           port map (                          
               i_clk   => clk,
               i_reset => btnL,
@@ -131,7 +131,6 @@ begin
 	-- CONCURRENT STATEMENTS ----------------------------
 	
 	-- leave unused switches UNCONNECTED
-	
 	
 	-- ground unused LEDs
 	led(12 downto 3) <= (others => '0');
