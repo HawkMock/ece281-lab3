@@ -98,12 +98,12 @@ architecture thunderbird_fsm_arch of thunderbird_fsm is
 
     -- create register signals with default state off "000"
 	signal f_S : STD_LOGIC_VECTOR (2 downto 0) := "000";
-	signal f_S_next : STD_LOGIC_VECTOR (2 downto 0);
+	signal f_S_next : STD_LOGIC_VECTOR (2 downto 0); --f_S_next does not need to be initialized since it is concurrently defined by f_S which is initialized.
   
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
-	-- Next state logic
+	-- Next state logic, where the next state is based on the current state and sometimes also the input. Direct transcription of the excel sheet.
         f_S_next(2) <= '1' when ( ( (f_S = "000") and (i_left = '0') and (i_right = '1') ) or
                                   ( (f_S = "000") and (i_left = '1') and (i_right = '1') ) or
                                   (f_S = "101") or
@@ -112,13 +112,13 @@ begin
                                   (f_S = "110") or
                                   (f_S = "001") or
                                   (f_S = "010") ) else '0';
-      --f_S_next(0) <= '1' when ( (f_S(1) xor f_S(2) );
+      --f_S_next(0) <= '1' when ( (f_S(1) xor f_S(2) ); --potential alternative but less readable logic for f_S_next(0)
         f_S_next(0) <= '1' when ( ( (f_S = "000") and (i_left = '0') and (i_right = '1') ) or
                                   ( (f_S = "000") and (i_left = '1') and (i_right = '0') ) or
                                   (f_S = "110") or
                                   (f_S = "010") ) else '0';
         
-        -- Output logic
+        -- Output logic, where the output lights are based on the current state only. Direct transcription of the excel sheet.
         o_lights_L(2) <= '1' when ( (f_S = "100") or
                                     (f_S = "011") ) else '0';
         o_lights_L(1) <= '1' when ( (f_S = "100") or
@@ -143,9 +143,9 @@ begin
     register_proc : process (i_clk, i_reset)
         begin
             if i_reset = '1' then
-                f_S <= "000";        -- reset state is ON
+                f_S <= "000";        -- reset state is OFF, or 000
             elsif (rising_edge(i_clk)) then
-                f_S <= f_S_next;    -- next state becomes current state
+                f_S <= f_S_next;    -- next state becomes current state when the clock ticks up
             end if;
         end process register_proc;
 	-----------------------------------------------------					   
